@@ -1,0 +1,9 @@
+* { 
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 60vh;
+  margin-bottom: 5rem;
+  padding: 0 .25em;
+}
