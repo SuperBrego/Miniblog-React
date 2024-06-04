@@ -9,6 +9,7 @@ type AuthReturnType = {
   error: string;
   loading: boolean;
   logout: () => void;
+  login: (data: any) => void;
 };
 
 
@@ -20,6 +21,7 @@ export const useAthentication = (): AuthReturnType => {
   // dentro da função de alguma maneira para funcionar a 
   // página e entender que tá sendo usado o Firebase App. 
   // Pode ser até um console.log, mas isso abaixo funcionou.
+  // Outra solução tem na aula 141 do curso.
   db.app;
 
   // Cleanup
@@ -80,10 +82,44 @@ export const useAthentication = (): AuthReturnType => {
     signOut(auth);
   }
 
+  // *********************************************************
+  // Login
+  // *********************************************************
+  const login = async(data: any) => {
+    checkIfIsCancelled();
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      setLoading(false);
+
+    } catch (error: any) {
+
+      let systemErrorMessage: string = '';
+
+      // Firebase descontinuou as mensagens específicas.
+      if (error.message.includes("user-not-found")) {
+        systemErrorMessage = "Usuário não encontrado.";
+      } else if (error.message.includes("wrong-password")) {
+        systemErrorMessage = "Senha incorreta.";
+      } else {
+        systemErrorMessage = "Ocorreu um erro, por favor tenta mais tarde.";
+      }
+
+      setError(systemErrorMessage);
+      setLoading(false);
+    } finally {
+      // setLoading(false);
+    }
+
+  }
+
   useEffect(() => {
     return () => setCancelled(true);
   }, []);
   
-  return { auth, createUser, error, loading, logout };
+  return { auth, createUser, error, loading, logout, login };
   
 }
